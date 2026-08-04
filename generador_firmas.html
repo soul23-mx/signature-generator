@@ -918,24 +918,24 @@ const STORE_VERSION = 2;
         filas.push(contactRow('fa-solid fa-location-dot', texto, mapa));
       }
 
-      const telSegs = [];
       (s.telefonos || []).forEach(function (t) {
         const num = (t.numero || '').trim();
         if (!num) return;
         const uso = t.tipo || 'whatsapp';
         const mostrar = esc(num);
         const intl = numeroIntl(num);
-        if (uso === 'llamada' || uso === 'ambos') {
-          telSegs.push('<a class="n39-link" href="tel:' + intl + '" style="color:#2e5aac; text-decoration:none;">' + mostrar + '</a>');
-        }
+        const segs = [];
         if (uso === 'whatsapp' || uso === 'ambos') {
-          telSegs.push('<a class="n39-link" href="https://wa.me/' + intl.replace(/\+/g, '') + '" style="color:#2e5aac; text-decoration:none;">' + mostrar + '</a>');
+          segs.push('<a class="n39-link" href="https://wa.me/' + intl.replace(/\+/g, '') + '" style="color:#2e5aac; text-decoration:none;">' + mostrar + '</a>');
         }
+        if (uso === 'llamada' || uso === 'ambos') {
+          segs.push('<a class="n39-link" href="tel:' + intl + '" style="color:#2e5aac; text-decoration:none;">' + mostrar + '</a>');
+        }
+        if (!segs.length) return;
+        const icono = (uso === 'whatsapp') ? 'fa-brands fa-whatsapp' : 'fa-solid fa-phone';
+        const linea = segs.join(' <span style="color:#b8924a; margin:0 6px;">|</span> ');
+        filas.push(contactRow(icono, linea, null));
       });
-      if (telSegs.length) {
-        const linea = telSegs.join(' <span style="color:#b8924a; margin:0 6px;">|</span> ');
-        filas.push(contactRow('fa-solid fa-phone', linea, null));
-      }
 
       (s.correos || []).forEach(function (c) {
         const mail = (c || '').trim();
