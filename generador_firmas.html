@@ -96,6 +96,7 @@
       gap: 24px;
       align-items: start;
     }
+    .layout > * { min-width: 0; }
 
     .card {
       background: var(--card);
@@ -127,7 +128,7 @@
     .card-head small { display: block; color: var(--muted); font-size: 11px; font-weight: 500; }
     .card-body { padding: 20px; }
 
-    .form-col { display: flex; flex-direction: column; gap: 24px; }
+    .form-col { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
 
     .field { margin-bottom: 14px; }
     .field:last-child { margin-bottom: 0; }
@@ -280,7 +281,7 @@
     .static-label { font-size: 11px; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.5px; }
     .static-value { font-size: 13px; color: var(--text); word-break: break-all; margin-top: 2px; }
 
-    .preview-col { display: flex; flex-direction: column; gap: 16px; }
+    .preview-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
     .preview-toolbar {
       display: flex;
       align-items: center;
@@ -347,6 +348,25 @@
     .preview-mobile .n39-name, .preview-mobile .n39-role { text-align: center !important; }
     .preview-mobile .n39-logo-light, .preview-mobile .n39-logo-dark { width: 104px !important; max-width: 60% !important; height: auto !important; }
     .preview-mobile .n39-gold-rule { margin-left: auto !important; margin-right: auto !important; }
+
+    /* On small screens the preview keeps the COMPLETE (desktop) two-column layout
+       but scaled proportionally to the viewport. These overrides beat the
+       signature's own @media (max-width:480px) rules so it never reflows to stacked. */
+    .preview-desktop .n39-signature { width: 640px !important; max-width: 640px !important; }
+    .preview-desktop .n39-shell { padding: 24px 26px !important; }
+    .preview-desktop .n39-col { display: table-cell !important; box-sizing: border-box !important; }
+    .preview-desktop .n39-brand-col { width: 31% !important; padding: 0 24px 0 0 !important; text-align: center !important; }
+    .preview-desktop .n39-divider {
+      display: table-cell !important;
+      width: 1px !important;
+      border-left: 1px solid #b8924a !important;
+      font-size: 0 !important;
+      line-height: 0 !important;
+    }
+    .preview-desktop .n39-data-col { width: 69% !important; padding: 0 0 0 26px !important; }
+    .preview-desktop .n39-name, .preview-desktop .n39-role { text-align: left !important; }
+    .preview-desktop .n39-logo-light, .preview-desktop .n39-logo-dark { width: 132px !important; max-width: none !important; }
+    .preview-desktop .n39-gold-rule { margin-left: 0 !important; margin-right: 0 !important; }
 
     .code-area {
       display: none;
@@ -666,10 +686,19 @@
             <button class="tab" type="button" data-vista="reply"><i class="fa-solid fa-reply" aria-hidden="true"></i> Reply</button>
           </div>
           <div class="spacer"></div>
-          <button id="btn-copiar" type="button" class="btn btn-accent btn-sm">
-            <i class="fa-regular fa-copy" aria-hidden="true"></i> Copiar HTML
-          </button>
-          <div class="dl-wrap">
+          <div class="dl-wrap" id="copy-wrap">
+            <button id="btn-copiar" type="button" class="btn btn-accent btn-sm" style="border-top-right-radius:0; border-bottom-right-radius:0;">
+              <i class="fa-regular fa-copy" aria-hidden="true"></i> Copiar
+            </button>
+            <button id="btn-copiar-caret" type="button" class="btn btn-accent btn-sm" style="border-top-left-radius:0; border-bottom-left-radius:0; border-left:1px solid rgba(255,255,255,.3); padding-left:10px; padding-right:10px;" aria-label="Más opciones de copiado">
+              <i class="fa-solid fa-caret-down dl-caret" aria-hidden="true"></i>
+            </button>
+            <div id="copy-menu" class="dl-menu">
+              <button type="button" class="dl-item" data-copy="completa"><i class="fa-solid fa-table-columns" aria-hidden="true"></i> Firma completa</button>
+              <button type="button" class="dl-item" data-copy="reply"><i class="fa-solid fa-reply" aria-hidden="true"></i> Firma reply / móvil</button>
+            </div>
+          </div>
+          <div class="dl-wrap" id="dl-wrap">
             <button id="btn-descargar" type="button" class="btn btn-gold btn-sm">
               <i class="fa-solid fa-download" aria-hidden="true"></i> Descargar <i class="fa-solid fa-caret-down dl-caret" aria-hidden="true"></i>
             </button>
@@ -1229,7 +1258,22 @@ const STORE_VERSION = 2;
         const html = activeView === 'reply' ? signatureHTMLSimple() : signatureHTML();
         copiar(html, 'HTML de la firma copiado');
       });
-      const dlWrap = document.querySelector('.dl-wrap');
+      const copyWrap = document.getElementById('copy-wrap');
+      document.getElementById('btn-copiar-caret').addEventListener('click', function (e) {
+        e.stopPropagation();
+        const open = copyWrap.classList.toggle('open');
+        document.getElementById('copy-menu').classList.toggle('show', open);
+      });
+      document.getElementById('copy-menu').addEventListener('click', function (e) {
+        const item = e.target.closest('.dl-item');
+        if (!item) return;
+        const tipo = item.dataset.copy;
+        const html = tipo === 'reply' ? signatureHTMLSimple() : signatureHTML();
+        copiar(html, tipo === 'reply' ? 'Firma reply / móvil copiada' : 'Firma completa copiada');
+        copyWrap.classList.remove('open');
+        document.getElementById('copy-menu').classList.remove('show');
+      });
+      const dlWrap = document.getElementById('dl-wrap');
       document.getElementById('btn-descargar').addEventListener('click', function (e) {
         e.stopPropagation();
         const open = dlWrap.classList.toggle('open');
@@ -1246,6 +1290,10 @@ const STORE_VERSION = 2;
         if (!dlWrap.contains(e.target)) {
           dlWrap.classList.remove('open');
           document.getElementById('dl-menu').classList.remove('show');
+        }
+        if (!copyWrap.contains(e.target)) {
+          copyWrap.classList.remove('open');
+          document.getElementById('copy-menu').classList.remove('show');
         }
       });
 
@@ -1273,6 +1321,7 @@ const STORE_VERSION = 2;
           const pv = document.getElementById('preview-vista');
           pv.classList.toggle('preview-mobile', vista === 'mobile');
           pv.classList.toggle('preview-reply', vista === 'reply');
+          pv.classList.toggle('preview-desktop', vista === 'desktop');
           pv.style.maxWidth = vista === 'mobile' ? '375px' : 'none';
           pv.style.margin = vista === 'mobile' ? '0 auto' : '0';
           updatePreview();
@@ -1316,8 +1365,42 @@ const STORE_VERSION = 2;
       }
       vista.innerHTML = tableOnly;
       vista.classList.toggle('preview-dark', document.querySelector('#modo-tabs .tab.active')?.dataset.modo === 'oscuro');
+      vista.classList.toggle('preview-desktop', !isReply && activeView !== 'mobile');
+      fitDesktopSignature();
       codigo.textContent = html;
     }
+
+    function fitDesktopSignature() {
+      const pv = document.getElementById('preview-vista');
+      const activeView = document.querySelector('#vista-tabs .tab.active')?.dataset.vista || 'desktop';
+      const inner = pv.firstElementChild;
+
+      pv.style.overflowX = '';
+      pv.style.height = '';
+      if (inner) inner.style.transform = '';
+
+      if (activeView !== 'desktop' || !inner) return;
+
+      const cs = getComputedStyle(pv);
+      const padL = parseFloat(cs.paddingLeft) || 0;
+      const padR = parseFloat(cs.paddingRight) || 0;
+      const padT = parseFloat(cs.paddingTop) || 0;
+      const padB = parseFloat(cs.paddingBottom) || 0;
+      const avail = pv.clientWidth - padL - padR;
+      if (!avail || avail >= 640) return;
+
+      const scale = avail / 640;
+      inner.style.transformOrigin = 'top left';
+      inner.style.transform = 'scale(' + scale + ')';
+      pv.style.overflowX = 'hidden';
+      pv.style.height = (inner.offsetHeight * scale + padT + padB) + 'px';
+    }
+
+    let resizeTimer = null;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(fitDesktopSignature, 120);
+    });
 
     function copiar(texto, mensaje) {
       function done() { toast(mensaje || 'Copiado al portapapeles'); }
