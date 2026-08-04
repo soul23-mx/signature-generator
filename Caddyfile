@@ -1,9 +1,0 @@
-:2015 {
-	root * .
-	file_server
-	try_files {path} /generador_firmas.html
-
-	header {
-		-Server
-	}
-}
