@@ -1147,7 +1147,7 @@ const STORE_VERSION = 2;
           '</a></div>';
       }
 
-      const body = '<div style="font-family:Inter, Arial, Helvetica, sans-serif; font-size:12px; line-height:1.5; color:#343a44; max-width:480px; text-align:center;">' +
+      const body = '<div style="font-family:Inter, Arial, Helvetica, sans-serif; font-size:12px; line-height:1.5; color:#343a44; max-width:480px; text-align:center; background-color:transparent;">' +
         logo +
         '<div class="n39-name" style="font-family:\'Cormorant Garamond\', Georgia, serif; font-size:16px; font-weight:600; color:#1b2a4a; margin-bottom:2px;">' + nombreEnc + '</div>' +
         (puestoEnc ? '<div class="n39-role" style="font-size:10px; font-weight:600; color:#2e5aac; text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px;">' + puestoEnc + '</div>' : '') +
@@ -1185,7 +1185,7 @@ const STORE_VERSION = 2;
         '[data-ogsc] a { color:#90acf2 !important; }' +
         '</style>\n' +
         '</head>\n\n' +
-        '<body>\n' + body + '\n' +
+        '<body style="margin:0; padding:0; background-color:transparent;">\n' + body + '\n' +
         '</body>\n' +
         '</html>\n';
     }
@@ -1466,7 +1466,7 @@ const STORE_VERSION = 2;
       const documento = new DOMParser().parseFromString(signatureHTMLSimple(), 'text/html');
       const firma = document.importNode(documento.body.firstElementChild, true);
       const contenedor = document.createElement('div');
-      contenedor.style.cssText = 'position:fixed; left:-10000px; top:0; opacity:0; pointer-events:none;';
+      contenedor.style.cssText = 'position:fixed; left:-10000px; top:0; opacity:0; pointer-events:none; background-color:transparent;';
       contenedor.appendChild(firma);
       document.body.appendChild(contenedor);
       copiarNodoRenderizado(firma, 'Reply renderizado copiado. Pégalo con Ctrl+V en Outlook.');
