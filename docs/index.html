@@ -702,7 +702,7 @@
           </div>
           <div class="spacer"></div>
           <button id="btn-copiar" type="button" class="btn btn-accent btn-sm">
-            <i class="fa-regular fa-copy" aria-hidden="true"></i> Copiar HTML
+            <i class="fa-regular fa-copy" aria-hidden="true"></i> Copiar firma
           </button>
           <div class="dl-wrap">
             <button id="btn-descargar" type="button" class="btn btn-gold btn-sm">
@@ -731,7 +731,7 @@
               </summary>
               <div style="padding:12px 14px; font-size:12px; line-height:1.8; color:#5f4a24; border-top:1px solid #e3d4ae;">
                 <ol style="margin:0; padding-left:18px;">
-                  <li>Pulsa <strong>Copiar HTML</strong> en este generador.</li>
+                  <li>Pulsa <strong>Copiar firma</strong> en este generador. Se copia la firma ya renderizada, no el código.</li>
                   <li>Abre un <em>Nuevo mensaje</em> → pestaña <em>Mensaje</em> → <em>Firma → Firmas…</em></li>
                   <li>En la ventana <em>Firmas y papel de carta</em>, pulsa <em>Nueva</em>, ponle nombre y <em>Aceptar</em>.</li>
                   <li>En <em>Editar firma</em>, haz clic derecho → <em>Pegar como HTML</em> (o <kbd>Ctrl+Shift+V</kbd>).</li>
@@ -1038,7 +1038,7 @@ const STORE_VERSION = 2;
         '</td>' +
         '<td class="n39-col n39-divider" width="1" style="width:1px; border-left:1px solid #b8924a; font-size:0; line-height:0;">&nbsp;</td>' +
         '<td class="n39-col n39-data-col" width="69%" valign="middle" style="width:69%; padding-left:26px;">' +
-        '<div class="n39-name" style="font-family:\'Cormorant Garamond\', Georgia, \'Times New Roman\', serif; font-size:23px; line-height:25px; font-weight:700; color:#1b2a4a; letter-spacing:.1px;">' + nombreEnc + '</div>' +
+        '<div class="n39-name" style="font-family:\'Cormorant Garamond\', Georgia, \'Times New Roman\', serif; font-size:23px; line-height:25px; font-weight:600; color:#1b2a4a; letter-spacing:.1px;">' + nombreEnc + '</div>' +
         '<div class="n39-role" style="margin-top:2px; font-family:Inter, Arial, Helvetica, sans-serif; font-size:10.5px; line-height:16px; font-weight:700; color:#2e5aac; text-transform:uppercase; letter-spacing:.75px;">' + puestoEnc + '</div>' +
         '<table role="presentation" class="n39-gold-rule" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:7px;">' +
         '<tr><td style="border-top:1px solid #b8924a; font-size:0; line-height:0;">&nbsp;</td></tr>' +
@@ -1107,7 +1107,7 @@ const STORE_VERSION = 2;
 
       const body = '<div style="font-family:Inter, Arial, Helvetica, sans-serif; font-size:12px; line-height:1.5; color:#343a44; max-width:480px; text-align:center;">' +
         logo +
-        '<div class="n39-name" style="font-family:\'Cormorant Garamond\', Georgia, serif; font-size:16px; font-weight:700; color:#1b2a4a; margin-bottom:2px;">' + nombreEnc + '</div>' +
+        '<div class="n39-name" style="font-family:\'Cormorant Garamond\', Georgia, serif; font-size:16px; font-weight:600; color:#1b2a4a; margin-bottom:2px;">' + nombreEnc + '</div>' +
         (puestoEnc ? '<div class="n39-role" style="font-size:10px; font-weight:600; color:#2e5aac; text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px;">' + puestoEnc + '</div>' : '') +
         '<div style="border-top:1px solid #b8924a; margin:6px auto; padding-top:6px; font-size:11.5px; word-break:break-word;">' + contactLines + '</div>' +
         '</div>';
@@ -1304,9 +1304,7 @@ const STORE_VERSION = 2;
       });
 
       document.getElementById('btn-copiar').addEventListener('click', function () {
-        const activeView = document.querySelector('#vista-tabs .tab.active')?.dataset.vista || 'desktop';
-        const html = activeView === 'reply' ? signatureHTMLSimple() : signatureHTML();
-        copiar(html, 'HTML de la firma copiado');
+        copiarFirmaRenderizada();
       });
       const dlWrap = document.querySelector('.dl-wrap');
       document.getElementById('btn-descargar').addEventListener('click', function (e) {
@@ -1398,25 +1396,28 @@ const STORE_VERSION = 2;
       codigo.textContent = html;
     }
 
-    function copiar(texto, mensaje) {
-      function done() { toast(mensaje || 'Copiado al portapapeles'); }
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(texto).then(done, function () { fallbackCopy(texto); done(); });
-      } else {
-        fallbackCopy(texto);
-        done();
-      }
-    }
+    function copiarFirmaRenderizada() {
+      const preview = document.getElementById('preview-vista');
+      const firma = preview.querySelector('.n39-signature') || preview.firstElementChild;
+      if (!firma) return;
 
-    function fallbackCopy(texto) {
-      const ta = document.createElement('textarea');
-      ta.value = texto;
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      try { document.execCommand('copy'); } catch (e) {}
-      document.body.removeChild(ta);
+      // Outlook Classic necesita contenido HTML en el portapapeles. Copiar una
+      // selección del DOM conserva las tablas, estilos inline y SVG ya renderizados.
+      const selection = window.getSelection();
+      const previousRanges = [];
+      for (let i = 0; i < selection.rangeCount; i += 1) previousRanges.push(selection.getRangeAt(i));
+
+      const range = document.createRange();
+      range.selectNode(firma);
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      let copied = false;
+      try { copied = document.execCommand('copy'); } catch (e) {}
+
+      selection.removeAllRanges();
+      previousRanges.forEach(function (previousRange) { selection.addRange(previousRange); });
+      toast(copied ? 'Firma renderizada copiada. Pégala con Ctrl+V en Outlook.' : 'No se pudo copiar la firma. Inténtalo de nuevo.');
     }
 
     function descargarTipo(tipo) {
