@@ -953,8 +953,8 @@ const STORE_VERSION = 2;
         ? texto
         : '<a class="n39-link" href="' + esc(href) + '" style="color:#2e5aac; text-decoration:none;">' + texto + '</a>';
       return '<tr>' +
-        '<td class="n39-icon" valign="top" style="width:18px; padding:2px 7px 2px 0; color:#2e5aac; text-align:center;">' + iconSVG(icono) + '</td>' +
-        '<td valign="top" style="padding:2px 0; word-break:break-word;">' + cell + '</td>' +
+        '<td class="n39-icon" valign="top" style="width:18px; padding:1px 7px 1px 0; color:#2e5aac; text-align:center;">' + iconSVG(icono) + '</td>' +
+        '<td valign="top" style="padding:1px 0; word-break:break-word;">' + cell + '</td>' +
         '</tr>';
     }
 
@@ -1014,8 +1014,8 @@ const STORE_VERSION = 2;
     const SIGNATURE_CSS =
       ':root { color-scheme: light dark; supported-color-schemes: light dark; }' +
       'body { margin:0; padding:0; background:transparent; }' +
-      '.n39-signature { width:640px; max-width:640px; border:0; background:transparent; color:#343a44; font-family:Inter, Arial, Helvetica, sans-serif; }' +
-      '.n39-name { font-family:"Cormorant Garamond", Georgia, "Times New Roman", serif; color:#1b2a4a; }' +
+      '.n39-signature { width:640px; max-width:640px; border:0; background:transparent; color:#343a44; font-family:Abadi, Calibri, Arial, Helvetica, sans-serif; }' +
+      '.n39-name { font-family:Abadi, Calibri, Arial, Helvetica, sans-serif; color:#1b2a4a; }' +
       '.n39-role, .n39-link, .n39-icon { color:#2e5aac; }' +
       '.n39-contact { color:#343a44; }' +
       '.n39-logo-dark { display:none; mso-hide:all; }' +
@@ -1067,8 +1067,8 @@ const STORE_VERSION = 2;
           '</tr>';
       }
       if (s.mostrarTitular) {
-        brand += '<tr><td class="n39-primary" align="center" style="padding-top:7px; white-space:nowrap; font-family:Inter, Arial, Helvetica, sans-serif; font-size:10px; line-height:14px; font-weight:700; color:#1b2a4a;">' + titularEnc + '</td></tr>' +
-          '<tr><td align="center" style="font-family:Inter, Arial, Helvetica, sans-serif; font-size:8.5px; line-height:13px; font-weight:600; color:#b8924a; text-transform:uppercase; letter-spacing:1.1px;">' + cargoEnc + '</td></tr>';
+        brand += '<tr><td class="n39-primary" align="center" style="padding-top:7px; white-space:nowrap; font-family:Abadi, Calibri, Arial, Helvetica, sans-serif; font-size:10px; line-height:14px; font-weight:700; color:#1b2a4a;">' + titularEnc + '</td></tr>' +
+          '<tr><td align="center" style="font-family:Abadi, Calibri, Arial, Helvetica, sans-serif; font-size:8.5px; line-height:13px; font-weight:600; color:#b8924a; text-transform:uppercase; letter-spacing:1.1px;">' + cargoEnc + '</td></tr>';
       }
 
       const body = '<table role="presentation" class="n39-signature" width="640" cellpadding="0" cellspacing="0" border="0">' +
@@ -1080,12 +1080,12 @@ const STORE_VERSION = 2;
         '</td>' +
         '<td class="n39-col n39-divider" width="1" style="width:1px; border-left:1px solid #b8924a; font-size:0; line-height:0;">&nbsp;</td>' +
         '<td class="n39-col n39-data-col" width="69%" valign="middle" style="width:69%; padding-left:26px;">' +
-        '<div class="n39-name" style="font-family:\'Cormorant Garamond\', Georgia, \'Times New Roman\', serif; font-size:23px; line-height:25px; font-weight:600; color:#1b2a4a; letter-spacing:.1px;">' + nombreEnc + '</div>' +
-        '<div class="n39-role" style="margin-top:2px; font-family:Inter, Arial, Helvetica, sans-serif; font-size:10.5px; line-height:16px; font-weight:700; color:#2e5aac; text-transform:uppercase; letter-spacing:.75px;">' + puestoEnc + '</div>' +
-        '<table role="presentation" class="n39-gold-rule" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:7px;">' +
+        '<div class="n39-name" style="font-family:Abadi, Calibri, Arial, Helvetica, sans-serif; font-size:15px; line-height:18px; font-weight:600; color:#1b2a4a; letter-spacing:.1px;">' + nombreEnc + '</div>' +
+        '<div class="n39-role" style="margin-top:2px; font-family:Abadi, Calibri, Arial, Helvetica, sans-serif; font-size:10.5px; line-height:16px; font-weight:700; color:#2e5aac; text-transform:uppercase; letter-spacing:.75px;">' + puestoEnc + '</div>' +
+        '<table role="presentation" class="n39-gold-rule" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:4px;">' +
         '<tr><td style="border-top:1px solid #b8924a; font-size:0; line-height:0;">&nbsp;</td></tr>' +
         '</table>' +
-        '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:9px; font-family:Inter, Arial, Helvetica, sans-serif; font-size:11.5px; line-height:17px; color:#343a44;">' + filas + '</table>' +
+        '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:4px; font-family:Abadi, Calibri, Arial, Helvetica, sans-serif; font-size:11.5px; line-height:15px; color:#343a44;">' + filas + '</table>' +
         '</td></tr></table></td></tr></table>';
 
       return '<!doctype html>\n' +
@@ -1096,9 +1096,6 @@ const STORE_VERSION = 2;
         '  <meta name="color-scheme" content="light dark">\n' +
         '  <meta name="supported-color-schemes" content="light dark">\n' +
         '  <title>Firma estilizada - ' + nombreEnc + '</title>\n\n' +
-        '  <link rel="preconnect" href="https://fonts.googleapis.com">\n' +
-        '  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n' +
-        '  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">\n' +
         '  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">\n\n' +
         '  <style>\n' + SIGNATURE_CSS + '\n  </style>\n' +
         '</head>\n\n' +
@@ -1147,11 +1144,11 @@ const STORE_VERSION = 2;
           '</a></div>';
       }
 
-      const body = '<div style="font-family:Inter, Arial, Helvetica, sans-serif; font-size:12px; line-height:1.5; color:#343a44; max-width:480px; text-align:center; background-color:#ffffff;">' +
+      const body = '<div style="font-family:Abadi, Calibri, Arial, Helvetica, sans-serif; font-size:12px; line-height:1.5; color:#343a44; max-width:480px; text-align:center; background-color:#ffffff;">' +
         logo +
-        '<div class="n39-name" style="font-family:\'Cormorant Garamond\', Georgia, serif; font-size:16px; font-weight:600; color:#1b2a4a; margin-bottom:2px;">' + nombreEnc + '</div>' +
-        (puestoEnc ? '<div class="n39-role" style="font-size:10px; font-weight:600; color:#2e5aac; text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px;">' + puestoEnc + '</div>' : '') +
-        '<div style="border-top:1px solid #b8924a; margin:6px auto; padding-top:6px; font-size:11.5px; word-break:break-word;">' + contactLines + '</div>' +
+        '<div class="n39-name" style="font-family:Abadi, Calibri, Arial, Helvetica, sans-serif; font-size:15px; font-weight:600; color:#1b2a4a; margin-bottom:2px;">' + nombreEnc + '</div>' +
+        (puestoEnc ? '<div class="n39-role" style="font-size:10px; font-weight:600; color:#2e5aac; text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px;">' + puestoEnc + '</div>' : '') +
+        '<div style="border-top:1px solid #b8924a; margin:4px auto; padding-top:4px; font-size:11.5px; word-break:break-word;">' + contactLines + '</div>' +
         '</div>';
 
       return '<!doctype html>\n' +
@@ -1162,9 +1159,6 @@ const STORE_VERSION = 2;
         '  <meta name="color-scheme" content="light dark">\n' +
         '  <meta name="supported-color-schemes" content="light dark">\n' +
         '  <title>Firma simple - ' + nombreEnc + '</title>\n\n' +
-        '  <link rel="preconnect" href="https://fonts.googleapis.com">\n' +
-        '  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n' +
-        '  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">\n' +
         '  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">\n\n' +
         '  <style>\n' +
         ':root { color-scheme: light dark; supported-color-schemes: light dark; }' +
