@@ -557,7 +557,7 @@
 
   <header class="topbar">
     <div class="topbar-inner">
-      <img class="topbar-logo" src="https://notaria39saltillo.com/logo_n39_wh.png" alt="Notaria Publica 39 - Gonzalez & Valdes">
+      <img class="topbar-logo" src="https://notaria39saltillo.com/logo_n39_wh.png" alt="Notaría Pública 39 - González & Valdés">
       <div>
         <h1>Generador de Firmas</h1>
         <p id="header-sub">Notaría Pública 39 · Saltillo, Coahuila</p>
@@ -683,7 +683,7 @@
           </div>
           <div class="static-item">
             <div class="static-label">Titular</div>
-            <div class="static-value">Lic. Carlos Alberto Gonzalez Martinez</div>
+            <div class="static-value">Lic. Carlos Alberto González Martínez</div>
           </div>
           <div class="static-item">
             <div class="static-label">Cargo</div>
@@ -864,7 +864,7 @@
       direccion: 'Priv. Primera No. 105, Residencial El Rosario',
       ubicacion: 'Saltillo, Coahuila 25297',
       mapa: 'https://maps.app.goo.gl/Z9X3pMmjvKSuWgaH8',
-      titular: 'Lic. Carlos Alberto Gonzalez Martinez',
+      titular: 'Lic. Carlos Alberto González Martínez',
       cargoTitular: 'Titular',
       logoClaro: 'https://notaria39saltillo.com/logo_n39.png',
       logoOscuro: 'https://notaria39saltillo.com/logo_n39_wh.png',
@@ -888,7 +888,7 @@ const STORE_VERSION = 3;
           const saved = JSON.parse(raw);
           state = Object.assign(cloneDefaults(), saved);
           // Migración v2 -> v3: WhatsApp ahora es 844 495 4391 (antes 844 100 4363)
-          // y se elimina el sufijo "Notaria 39" del puesto.
+          // y se elimina el sufijo "Notaría 39" del puesto.
           const OLD_WHATSAPP = '8441004363';
           const hasOldWhats = (state.telefonos || []).some(function(t){
             return (t.numero||'').replace(/\D/g,'') === OLD_WHATSAPP;
@@ -1088,8 +1088,8 @@ const STORE_VERSION = 3;
         brand += '<tr>' +
           '<td align="center">' +
           '<a href="' + esc(s.sitio) + '" target="_blank" style="text-decoration:none; border:0;">' +
-          '<img class="n39-logo-light" src="' + esc(s.logoClaro) + '" width="132" alt="Notaria Publica 39 - Gonzalez &amp; Valdes" style="display:block; width:132px; height:auto; border:0; outline:none; text-decoration:none;">' +
-          '<img class="n39-logo-dark" src="' + esc(s.logoOscuro) + '" width="132" alt="Notaria Publica 39 - Gonzalez &amp; Valdes" style="display:none; width:132px; height:auto; border:0; outline:none; text-decoration:none; mso-hide:all;">' +
+          '<img class="n39-logo-light" src="' + esc(s.logoClaro) + '" width="132" alt="Notaría Pública 39 - González &amp; Valdés" style="display:block; width:132px; height:auto; border:0; outline:none; text-decoration:none;">' +
+          '<img class="n39-logo-dark" src="' + esc(s.logoOscuro) + '" width="132" alt="Notaría Pública 39 - González &amp; Valdés" style="display:none; width:132px; height:auto; border:0; outline:none; text-decoration:none; mso-hide:all;">' +
           '</a>' +
           '</td>' +
           '</tr>';
@@ -1167,8 +1167,8 @@ const STORE_VERSION = 3;
       if (s.mostrarLogo) {
         logo = '<div style="text-align:center; margin-bottom:8px;">' +
           '<a href="' + esc(s.sitio) + '" target="_blank" style="text-decoration:none; border:0;">' +
-          '<img class="n39-logo-light" src="' + esc(s.logoClaro) + '" width="120" alt="Notaria Publica 39 - Gonzalez &amp; Valdes" style="display:block; width:120px; max-width:60%; height:auto; border:0; margin:0 auto; outline:none; text-decoration:none;">' +
-          '<img class="n39-logo-dark" src="' + esc(s.logoOscuro) + '" width="120" alt="Notaria Publica 39 - Gonzalez &amp; Valdes" style="display:none; width:120px; max-width:60%; height:auto; border:0; margin:0 auto; outline:none; text-decoration:none; mso-hide:all;">' +
+          '<img class="n39-logo-light" src="' + esc(s.logoClaro) + '" width="120" alt="Notaría Pública 39 - González &amp; Valdés" style="display:block; width:120px; max-width:60%; height:auto; border:0; margin:0 auto; outline:none; text-decoration:none;">' +
+          '<img class="n39-logo-dark" src="' + esc(s.logoOscuro) + '" width="120" alt="Notaría Pública 39 - González &amp; Valdés" style="display:none; width:120px; max-width:60%; height:auto; border:0; margin:0 auto; outline:none; text-decoration:none; mso-hide:all;">' +
           '</a></div>';
       }
 
