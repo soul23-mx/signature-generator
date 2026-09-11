@@ -619,12 +619,18 @@
           </div>
 
           <div class="field">
-            <label>Teléfonos</label>
-            <div id="telefonos-list"></div>
-            <button id="add-telefono" type="button" class="btn btn-outline btn-sm">
-              <i class="fa-solid fa-plus" aria-hidden="true"></i> Agregar teléfono
-            </button>
-            <div class="hint">Agrega los teléfonos de la persona. Elige WhatsApp, Llamadas o Ambos; se generan los enlaces automáticamente. Las llamadas se muestran primero en la firma.</div>
+            <label>Teléfonos <span style="font-weight:500; color:var(--muted); font-size:11px;">— fijos</span></label>
+            <div style="display:grid; gap:8px;">
+              <div style="display:flex; align-items:center; gap:10px; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:10px 12px;">
+                <span style="width:28px; height:28px; border-radius:7px; background:#fff; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--accent); flex:none;"><i class="fa-solid fa-phone" aria-hidden="true"></i></span>
+                <div style="flex:1;"><div style="font-size:11px; font-weight:700; color:var(--gold); text-transform:uppercase; letter-spacing:0.5px;">Llamadas</div><div style="font-size:13px; font-weight:600; color:var(--text);">844 485 0741</div></div>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:10px 12px;">
+                <span style="width:28px; height:28px; border-radius:7px; background:#fff; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:#25D366; flex:none;"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i></span>
+                <div style="flex:1;"><div style="font-size:11px; font-weight:700; color:var(--gold); text-transform:uppercase; letter-spacing:0.5px;">WhatsApp</div><div style="font-size:13px; font-weight:600; color:var(--text);">844 495 4391</div></div>
+              </div>
+            </div>
+            <div class="hint">Números fijos de la notaría — se incluyen automáticamente en todas las firmas.</div>
           </div>
 
           <hr class="separator">
@@ -677,7 +683,7 @@
           </div>
           <div class="static-item">
             <div class="static-label">Titular</div>
-            <div class="static-value">Lic. Carlos Alberto González Martínez</div>
+            <div class="static-value">Lic. Carlos Alberto Gonzalez Martinez</div>
           </div>
           <div class="static-item">
             <div class="static-label">Cargo</div>
@@ -852,13 +858,13 @@
       puesto: 'Atención a Clientes',
       correos: ['atencionaclientes@notaria39saltillo.com'],
       telefonos: [
-        { numero: '844 100 4363', tipo: 'whatsapp', extension: '', mostrarExtension: false },
+        { numero: '844 495 4391', tipo: 'whatsapp', extension: '', mostrarExtension: false },
         { numero: '844 485 0741', tipo: 'llamada', extension: '', mostrarExtension: true }
       ],
-      direccion: 'Privada Primera No. 105, Residencial El Rosario',
+      direccion: 'Priv. Primera No. 105, Residencial El Rosario',
       ubicacion: 'Saltillo, Coahuila 25297',
       mapa: 'https://maps.app.goo.gl/Z9X3pMmjvKSuWgaH8',
-      titular: 'Lic. Carlos Alberto González Martínez',
+      titular: 'Lic. Carlos Alberto Gonzalez Martinez',
       cargoTitular: 'Titular',
       logoClaro: 'https://notaria39saltillo.com/logo_n39.png',
       logoOscuro: 'https://notaria39saltillo.com/logo_n39_wh.png',
@@ -867,7 +873,7 @@
       mostrarTitular: true
     };
     const STORE_KEY = 'n39-generador-firmas-v1';
-const STORE_VERSION = 2;
+const STORE_VERSION = 3;
 
     let state = JSON.parse(JSON.stringify(DEFAULT));
 
@@ -881,8 +887,23 @@ const STORE_VERSION = 2;
         if (raw) {
           const saved = JSON.parse(raw);
           state = Object.assign(cloneDefaults(), saved);
+          // Migración v2 -> v3: WhatsApp ahora es 844 495 4391 (antes 844 100 4363)
+          // y se elimina el sufijo "Notaria 39" del puesto.
+          const OLD_WHATSAPP = '8441004363';
+          const hasOldWhats = (state.telefonos || []).some(function(t){
+            return (t.numero||'').replace(/\D/g,'') === OLD_WHATSAPP;
+          });
+          if (hasOldWhats) {
+            state.telefonos = JSON.parse(JSON.stringify(DEFAULT.telefonos));
+          }
+          if ((state.direccion || '').trim() === 'Privada Primera No. 105, Residencial El Rosario') {
+            state.direccion = DEFAULT.direccion;
+          }
+          state._v = STORE_VERSION;
         }
       } catch (e) { state = cloneDefaults(); }
+      // Teléfonos son constantes fijas de la notaría
+      state.telefonos = JSON.parse(JSON.stringify(DEFAULT.telefonos));
       state.mostrarLogo = true;
       state.mostrarTitular = true;
       state.logoClaro = DEFAULT.logoClaro;
@@ -890,10 +911,11 @@ const STORE_VERSION = 2;
       state.sitio = DEFAULT.sitio;
       state.titular = DEFAULT.titular;
       state.cargoTitular = DEFAULT.cargoTitular;
+      if (!state._v) state._v = STORE_VERSION;
     }
 
     function saveState() {
-      try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {}
+      try { state._v = STORE_VERSION; localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {}
     }
 
     function esc(s) {
@@ -964,7 +986,28 @@ const STORE_VERSION = 2;
       const dir = (s.direccion || '').trim();
       const ubi = (s.ubicacion || '').trim();
 
-      // Las llamadas aparecen antes que el resto de los medios de contacto.
+      (s.correos || []).forEach(function (c) {
+        const mail = (c || '').trim();
+        if (!mail) return;
+        const me = esc(mail);
+        filas.push(contactRow('fa-solid fa-envelope', me, 'mailto:' + me));
+      });
+
+      if (dir || ubi) {
+        const texto = (function(){
+          const d = dir ? esc(dir) : '';
+          const u = ubi ? esc(ubi) : '';
+          const uNoBreak = u ? '<span style="white-space:nowrap;">' + u + '</span>' : '';
+          if (d && uNoBreak) return d + ', ' + uNoBreak;
+          return d || uNoBreak;
+        })();
+        const mapa = (s.mapa || '').trim() || DEFAULT.mapa;
+        filas.push(contactRow('fa-solid fa-location-dot', texto, mapa));
+      }
+
+      filas.push(contactRow('fa-solid fa-globe', 'notaria39saltillo.com', s.sitio));
+
+      // Las llamadas aparecen antes que WhatsApp.
       (s.telefonos || []).forEach(function (t) {
         const num = (t.numero || '').trim();
         if (!num) return;
@@ -992,21 +1035,6 @@ const STORE_VERSION = 2;
           filas.push(contactRow('fa-brands fa-whatsapp', link, null));
         }
       });
-
-      if (dir || ubi) {
-        const texto = [dir, ubi].filter(Boolean).map(esc).join('<br>');
-        const mapa = (s.mapa || '').trim() || DEFAULT.mapa;
-        filas.push(contactRow('fa-solid fa-location-dot', texto, mapa));
-      }
-
-      (s.correos || []).forEach(function (c) {
-        const mail = (c || '').trim();
-        if (!mail) return;
-        const me = esc(mail);
-        filas.push(contactRow('fa-solid fa-envelope', me, 'mailto:' + me));
-      });
-
-      filas.push(contactRow('fa-solid fa-globe', 'notaria39saltillo.com', s.sitio));
 
       return filas.join('');
     }
@@ -1048,7 +1076,7 @@ const STORE_VERSION = 2;
     function signatureHTML() {
       const s = getState();
       const nombreVisible = [s.tratamiento, s.nombre].filter(Boolean).join(' ');
-      const puestoVisible = [s.puesto, 'Notaria Publica 39'].filter(Boolean).join(' . ');
+      const puestoVisible = (s.puesto || '').trim();
       const nombreEnc = esc(nombreVisible);
       const puestoEnc = esc(puestoVisible);
       const titularEnc = esc(s.titular);
@@ -1195,29 +1223,10 @@ const STORE_VERSION = 2;
     }
 
     function renderTelefonos() {
+      // Teléfonos son constantes fijas — no editables. Mantener función por compatibilidad pero no renderiza UI.
       const caja = document.getElementById('telefonos-list');
-      caja.innerHTML = state.telefonos.map(function (t, i) {
-        const isOffice = (t.numero || '').replace(/\D/g, '') === OFFICE_PHONE.replace(/\D/g, '');
-        const tipoEfectivo = isOffice ? 'llamada' : (t.tipo || 'whatsapp');
-        const seg = isOffice
-          ? '<span class="seg" style="opacity:.6;" title="Teléfono fijo de la oficina">' + labelTipo('llamada') + '</span>'
-          : ['whatsapp', 'llamada', 'ambos'].map(function (ty) {
-              return '<button type="button" class="seg' + (tipoEfectivo === ty ? ' active' : '') + '" data-tipo="' + ty + '" data-i="' + i + '">' + labelTipo(ty) + '</button>';
-            }).join('');
-        const extOn = isOffice || !!t.mostrarExtension;
-        const extToggle = (!isOffice && (tipoEfectivo === 'llamada' || tipoEfectivo === 'ambos'))
-          ? '<label class="ext-toggle"><input type="checkbox" class="ext-toggle-cb" data-i="' + i + '"' + (extOn ? ' checked' : '') + '><span class="track"></span>Ext.</label>'
-          : '';
-        const extInput = extOn
-          ? '<input class="input telefono-ext" data-i="' + i + '" type="text" value="' + esc(t.extension || '') + '" placeholder="Ext. 123" style="flex:1 1 90px;">'
-          : '';
-        return '<div class="row" style="flex-wrap:wrap;">' +
-          '<input class="input telefono-input" data-i="' + i + '" type="text" value="' + esc(t.numero) + '" placeholder="844 000 0000">' +
-          '<div class="segmented">' + seg + '</div>' +
-          extToggle + extInput +
-          '<button type="button" class="btn btn-danger btn-sm remove-telefono" data-i="' + i + '" aria-label="Quitar teléfono"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>' +
-          '</div>';
-      }).join('');
+      if (!caja) return;
+      caja.innerHTML = '';
     }
 
     function renderForm() {
@@ -1288,44 +1297,47 @@ const STORE_VERSION = 2;
       });
 
       const telsList = document.getElementById('telefonos-list');
-      telsList.addEventListener('input', function (e) {
-        if (e.target.classList.contains('telefono-input')) {
-          state.telefonos[Number(e.target.dataset.i)].numero = e.target.value;
-          commit();
-        } else if (e.target.classList.contains('telefono-ext')) {
-          state.telefonos[Number(e.target.dataset.i)].extension = e.target.value;
-          commit();
-        }
-      });
-      telsList.addEventListener('click', function (e) {
-        const cb = e.target.closest('.ext-toggle-cb');
-        if (cb) {
-          const i = Number(cb.dataset.i);
-          state.telefonos[i].mostrarExtension = cb.checked;
+      if (telsList) {
+        telsList.addEventListener('input', function (e) {
+          if (e.target.classList.contains('telefono-input')) {
+            state.telefonos[Number(e.target.dataset.i)].numero = e.target.value;
+            commit();
+          } else if (e.target.classList.contains('telefono-ext')) {
+            state.telefonos[Number(e.target.dataset.i)].extension = e.target.value;
+            commit();
+          }
+        });
+        telsList.addEventListener('click', function (e) {
+          const cb = e.target.closest('.ext-toggle-cb');
+          if (cb) {
+            const i = Number(cb.dataset.i);
+            state.telefonos[i].mostrarExtension = cb.checked;
+            renderTelefonos();
+            commit();
+            return;
+          }
+          const seg = e.target.closest('.seg');
+          if (seg) {
+            const i = Number(seg.dataset.i);
+            const t = state.telefonos[i];
+            if ((t.numero || '').replace(/\D/g, '') === OFFICE_PHONE.replace(/\D/g, '')) return;
+            t.tipo = seg.dataset.tipo;
+            telsList.querySelectorAll('.seg').forEach(function (b) {
+              if (Number(b.dataset.i) === i) b.classList.toggle('active', b === seg);
+            });
+            commit();
+            return;
+          }
+          const rm = e.target.closest('.remove-telefono');
+          if (!rm) return;
+          state.telefonos.splice(Number(rm.dataset.i), 1);
+          if (!state.telefonos.length) state.telefonos.push({ numero: '', tipo: 'whatsapp' });
           renderTelefonos();
           commit();
-          return;
-        }
-        const seg = e.target.closest('.seg');
-        if (seg) {
-          const i = Number(seg.dataset.i);
-          const t = state.telefonos[i];
-          if ((t.numero || '').replace(/\D/g, '') === OFFICE_PHONE.replace(/\D/g, '')) return;
-          t.tipo = seg.dataset.tipo;
-          telsList.querySelectorAll('.seg').forEach(function (b) {
-            if (Number(b.dataset.i) === i) b.classList.toggle('active', b === seg);
-          });
-          commit();
-          return;
-        }
-        const rm = e.target.closest('.remove-telefono');
-        if (!rm) return;
-        state.telefonos.splice(Number(rm.dataset.i), 1);
-        if (!state.telefonos.length) state.telefonos.push({ numero: '', tipo: 'whatsapp' });
-        renderTelefonos();
-        commit();
-      });
-      document.getElementById('add-telefono').addEventListener('click', function () {
+        });
+      }
+      const addTel = document.getElementById('add-telefono');
+      if (addTel) addTel.addEventListener('click', function () {
         state.telefonos.push({ numero: '', tipo: 'whatsapp', extension: '', mostrarExtension: false });
         renderTelefonos();
         commit();
